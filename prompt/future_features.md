@@ -3,6 +3,7 @@ create files
 debug files
 create test cases
 SSE processing to stream responses
+add the ability to add src code by crawling the tree (use only necessary files; create a .crawlignore)
 work across multiple repositories simultaneously
 work with mulitple versions of this code simultaneously through github
 
