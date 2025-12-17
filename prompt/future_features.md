@@ -21,7 +21,7 @@ send me a notification when the updates are complete through slack
 
 # Bugs
  I do not need to create a tree when using -t if the __tree__.md is not empty
-
+whenever i create a new conda env, i need to reinstall the requirements.txt; how do I surmount this problem?
 
 
  # Example prompt
