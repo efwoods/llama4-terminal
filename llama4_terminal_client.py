@@ -33,7 +33,7 @@ def load_config():
     }
     
     # Create missing files
-    for file_path in [config["SRC_CONTEXT_FILE"], config["IMAGE_CONTEXT_FILE"], config["SYSTEM_CONTEXT_FILE"], config["PROMPT_CONTEXT_FILE"], config["RESPONSE_FILE_PATH"], config["BUG_CONTEXT_FILE"], config["TREE_OUTPUT_FILE"]]:
+    for file_path in [config["SRC_CONTEXT_FILE"], config["IMAGE_CONTEXT_FILE"], config["SYSTEM_CONTEXT_FILE"], config["PROMPT_CONTEXT_FILE"], config["RESPONSE_FILE_PATH"], config["TREE_OUTPUT_FILE"]]:
         if not os.path.exists(file_path):
             try:
                 with open(file_path, 'w') as file:
