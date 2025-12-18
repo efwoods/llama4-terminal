@@ -115,8 +115,7 @@ def create_client(model_name: str, config: dict) -> OpenAI:
     if 'llama' in model_name.lower():
         return OpenAI(base_url=config["LLAMA_API_BASE_URL"], api_key=config["LLAMA_API_KEY"])
     else:
-        return OpenAI(base_url=config["PROPRIETARY_API_BASE_URL"], 
-api_key=config["PROPRIETARY_API_KEY"])
+        return OpenAI(base_url=config["PROPRIETARY_API_BASE_URL"], api_key=config["PROPRIETARY_API_KEY"])
 
 def prepare_user_text(args, config: dict) -> str:
     user_text = ""
@@ -209,6 +208,62 @@ def load_image_context(file_list_path: str) -> list:
     return image_paths
 
 
+import shutil
+from typing import Literal
+
+Style = Literal["double", "single", "heavy", "minimal", "rounded"]
+
+def terminal_width(default: int = 80) -> int:
+    try:
+        return shutil.get_terminal_size().columns
+    except Exception:
+        return default
+
+
+def print_section(
+    title: str,
+    style: Style = "double",
+    padding: int = 2
+) -> None:
+    width = terminal_width()
+    # width = 20
+    title = f"{' ' * padding}{title.upper()}{' ' * padding}"
+
+    if style == "double":
+        top = "╔" + "═" * (width - 2) + "╗"
+        mid = "║" + title.center(width - 2) + "║"
+        bot = "╚" + "═" * (width - 2) + "╝"
+
+    elif style == "single":
+        top = "┌" + "─" * (width - 2) + "┐"
+        mid = "│" + title.center(width - 2) + "│"
+        bot = "└" + "─" * (width - 2) + "┘"
+
+    elif style == "heavy":
+        top = "█" * width
+        mid = "█" + title.center(width - 2) + "█"
+        bot = "█" * width
+
+    elif style == "rounded":
+        top = "╭" + "─" * (width - 2) + "╮"
+        mid = "│" + title.center(width - 2) + "│"
+        bot = "╰" + "─" * (width - 2) + "╯"
+
+    elif style == "minimal":
+        print("─" * width)
+        print(title.strip().center(width))
+        print("─" * width)
+        return
+
+    else:
+        raise ValueError(f"Unknown style: {style}")
+
+    print(top)
+    print(mid)
+    print(bot)
+
+
+
 def main():
     config = load_config()
     parser = argparse.ArgumentParser(description="LLAMA 4 Terminal Client")
@@ -226,7 +281,7 @@ def main():
     parser.add_argument("-t", '--tree', action="store_true", help='Use directory tree as context')
     args = parser.parse_args()
 
-    console.print("LLAMA 4 Terminal")
+    print_section("LLAMA 4 Terminal", style="heavy")
 
     model_name = args.model
     client = create_client(model_name, config)
@@ -237,7 +292,7 @@ def main():
         return
 
     if args.verbose:
-        console.print("\nInput:\n")
+        print_section("Input:", style="double")
         console.print(user_text)
 
     content = [{"type": "text", "text": user_text}]
@@ -278,7 +333,7 @@ def main():
     try:
         response = client.chat.completions.create(model=model_name, messages=messages, max_tokens=2500)
         reply = response.choices[0].message.content
-        console.print("\nResponse:\n")
+        print_section("Response:", style="rounded")
         console.print(reply)
         save_response_to_file(reply, config["RESPONSE_FILE_PATH"])
     except Exception as e:
