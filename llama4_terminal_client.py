@@ -25,7 +25,7 @@ def load_config():
         "PROPRIETARY_API_KEY": os.getenv("PROPRIETARY_API_KEY"),
         "PROPRIETARY_API_BASE_URL": os.getenv("PROPRIETARY_API_BASE_URL"),
         "MODEL_NAME": "Llama-4-Maverick-17B-128E-Instruct-FP8",
-        "SRC_CONTEXT_FILE": os.path.join(prompt_dir, "__src_context__.md"),
+        "SRC_CONTEXT_FILE": os.path.join(prompt_dir, "__code_context__.md"),
         "IMAGE_CONTEXT_FILE": os.path.join(prompt_dir, "__images__.md"),
         "SYSTEM_CONTEXT_FILE": os.path.join(prompt_dir, "__system_context__.md"),
         "PROMPT_CONTEXT_FILE": os.path.join(prompt_dir, "__prompt__.md"),
@@ -275,7 +275,7 @@ def main():
     parser.add_argument("-i", "--image", nargs="+", help="Path to local image file")
     parser.add_argument("-I", "--image-context", action="store_true", help="Use image context from ./prompt/__images__.md")
     parser.add_argument("-f", "--file", nargs="+", help="Path to text file")
-    parser.add_argument("-c", "--code-context", action="store_true", help="Use code context from ./prompt/__src_context__.md")
+    parser.add_argument("-c", "--code-context", action="store_true", help="Use code context from ./prompt/__code_context__.md")
     parser.add_argument("-s", "--system-context", action="store_true", help="Use system context from ./prompt/__system_context__.md as user text")
     parser.add_argument("-p", "--prompt-context", action="store_true", help="Use prompt context from ./prompt/__prompt__.md")
     parser.add_argument("-r", "--response", action="store_true", help="Use previous response as context")

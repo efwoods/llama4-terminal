@@ -1,13 +1,57 @@
 #!/bin/bash
+# install_llama4_terminal.sh
+# Installs llama4_terminal_client with decorative ASCII success messages
 
-# Define the installation directory
-INSTALL_DIR="/usr/local/bin"
+set -euo pipefail
 
-# Create the installation directory if it doesn't exist
+INSTALL_DIR="/usr/local/bin/llama4_terminal_client"
+
+# Create directories
 sudo mkdir -p "$INSTALL_DIR"
+sudo mkdir -p "$INSTALL_DIR/prompt"
 
-# Copy the Python script to the installation directory
+# Copy files
 sudo cp llama4_terminal_client.py "$INSTALL_DIR/llama4_terminal_client.py"
 sudo cp .env "$INSTALL_DIR/.env"
-echo "llama4_terminal_client successfully installed!"
-echo "Use python /usr/local/bin/llama4_terminal_client.py -h for usage instructions or create an alias for ease of use!"
+sudo cp ./prompt/__system_context__.md "$INSTALL_DIR/prompt/__system_context__.md"
+
+# Decorative success messages
+cat << 'EOF'
+
+╔════════════════════════════════════════════════════════════╗
+║                                                            ║
+║   ███████╗██╗   ██╗ ██████╗ ██████╗███████╗███████╗███████╗║
+║   ██╔════╝██║   ██║██╔════╝██╔════╝██╔════╝██╔════╝██╔════╝║
+║   ███████╗██║   ██║██║     ██║     █████╗  ███████╗███████╗║
+║   ╚════██║██║   ██║██║     ██║     ██╔══╝  ╚════██║╚════██║║
+║   ███████║╚██████╔╝╚██████╗╚██████╗███████╗███████╗███████║║
+║   ╚══════╝ ╚═════╝  ╚═════╝ ╚═════╝╚══════╝╚══════╝╚══════╝║
+║                                                            ║
+║          llama4_terminal_client successfully installed!    ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+
+EOF
+
+cat << 'EOF'
+
+╔════════════════════════════════════════════════════════════╗
+║                        USAGE TIP                           ║
+║                                                            ║
+
+Run: 
+
+python /usr/local/bin/llama4_terminal_client/llama4_terminal_client.py -h
+
+║                                                            ║
+                                                             ║
+For convenience, add an alias to your ~/.bashrc:             ║
+
+║                                                            ║
+
+alias llama4='python /usr/local/bin/llama4_terminal_client/llama4_terminal_client.py'
+
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+
+EOF
