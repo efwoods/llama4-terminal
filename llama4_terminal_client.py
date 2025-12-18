@@ -32,6 +32,7 @@ def load_config():
         "RESPONSE_FILE_PATH": os.path.join(prompt_dir, "__response__.md"),
         "BUG_CONTEXT_FILE": os.path.join(prompt_dir, "__bug__.md"),
         "TREE_OUTPUT_FILE": os.path.join(prompt_dir, "__tree__.md"),
+        "INSTALL_DIR": "/usr/local/bin/llama4_terminal_client",
     }
     
     # Create missing files
@@ -126,6 +127,14 @@ def prepare_user_text(args, config: dict) -> str:
         system_context_content = load_code_file_into_context(config["SYSTEM_CONTEXT_FILE"])
         if system_context_content:
             user_text += f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{system_context_content}"
+        else:
+            install_system_context_path = os.path.join(config["INSTALL_DIR"], "prompt", "__system_context__.md")
+            console.print(f"Local system context is empty, checking install directory: {install_system_context_path}")
+            install_system_context_content = load_code_file_into_context(install_system_context_path)
+            if install_system_context_content:
+                user_text += f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{install_system_context_content}"
+            else:
+                console.print("No system context found.")
     
     user_text += f"<|eot_id|><|start_header_id|>user<|end_header_id|>"
 
