@@ -8,6 +8,8 @@ from PIL import Image
 from rich.console import Console
 from openai import OpenAI
 from dotenv import load_dotenv
+import shutil
+from typing import Literal
 
 console = Console()
 
@@ -119,35 +121,13 @@ def create_client(model_name: str, config: dict) -> OpenAI:
 
 def prepare_user_text(args, config: dict) -> str:
     user_text = ""
-    if args.message:
-        user_text += f"### User Message ###\n{args.message}\n### End of User Message ###\n\n"
-
-    if args.code_context:
-        code_files = load_src_context(config["SRC_CONTEXT_FILE"])
-        for file in code_files:
-            console.print(f"Using code file: {file}")
-            file_content = load_code_file_into_context(file)
-            if file_content:
-                user_text += f"### Code File: {file} ###\n{file_content}\n### End of Code File: {file} ###\n\n"
-
     if args.system_context:
         console.print(f"Using system context file: {config['SYSTEM_CONTEXT_FILE']}")
         system_context_content = load_code_file_into_context(config["SYSTEM_CONTEXT_FILE"])
         if system_context_content:
-            user_text = system_context_content
-
-    if args.prompt_context:
-        console.print(f"Using prompt context file: {config['PROMPT_CONTEXT_FILE']}")
-        prompt_context_content = load_code_file_into_context(config["PROMPT_CONTEXT_FILE"])
-        if prompt_context_content:
-            user_text += f"### Prompt Context ###\n{prompt_context_content}\n### End of Prompt Context ###\n\n"
-
-    if args.file:
-        for file in args.file:
-            console.print(f"Using text file: {file}")
-            file_content = load_code_file_into_context(file)
-            if file_content:
-                user_text += f"### File: {file} ###\n{file_content}\n### End of File: {file} ###\n\n"
+            user_text += f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>{system_context_content}"
+    
+    user_text += f"<|eot_id|><|start_header_id|>user<|end_header_id|>"
 
     if args.tree:
         try:
@@ -160,6 +140,22 @@ def prepare_user_text(args, config: dict) -> str:
         except Exception as e:
             console.print(f"Failed to generate directory tree: {e}")
 
+    if args.code_context:
+        code_files = load_src_context(config["SRC_CONTEXT_FILE"])
+        for file in code_files:
+            console.print(f"Using code file: {file}")
+            file_content = load_code_file_into_context(file)
+            if file_content:
+                user_text += f"### Code File: {file} ###\n{file_content}\n### End of Code File: {file} ###\n\n"
+
+    if args.file:
+        for file in args.file:
+            console.print(f"Using text file: {file}")
+            file_content = load_code_file_into_context(file)
+            if file_content:
+                user_text += f"### File: {file} ###\n{file_content}\n### End of File: {file} ###\n\n"    
+
+
     if args.bug:
             console.print(f"Debugging: {args.bug}")
             console.print(f"Debugging using bug context file: {config['BUG_CONTEXT_FILE']}")
@@ -167,11 +163,21 @@ def prepare_user_text(args, config: dict) -> str:
             if bug_content:
                 user_text += f"### Bug Report: {args.bug} ###\nThe following is a bug located in the code context. Please identify the root cause of the bug and edit the code so as to eliminate the bug. Please indicate the error and where the code was updated to resolve the error.\n\n{bug_content}\n### End of Bug Report: {args.bug} ###\n\n"
 
+    if args.message:
+        user_text += f"### TASK ###\n{args.message}\n### End of TASK ###\n\n"
+
+    if args.prompt_context:
+        console.print(f"Using prompt context file: {config['PROMPT_CONTEXT_FILE']}")
+        prompt_context_content = load_code_file_into_context(config["PROMPT_CONTEXT_FILE"])
+        if prompt_context_content:
+            user_text += f"### TASK ###\n{prompt_context_content}\n### End of TASK ###\n\n"
+
     if not sys.stdin.isatty():
-        user_text += f"### Standard Input ###\n{sys.stdin.read().strip()}\n### End of Standard Input ###\n\n"
+        user_text += f"### TASK ###\n{sys.stdin.read().strip()}\n### TASK ###\n\n"
+
+    user_text += f"<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
 
     return user_text.strip()
-
 
 
 def load_image_context(file_list_path: str) -> list:
@@ -208,8 +214,7 @@ def load_image_context(file_list_path: str) -> list:
     return image_paths
 
 
-import shutil
-from typing import Literal
+
 
 Style = Literal["double", "single", "heavy", "minimal", "rounded"]
 
@@ -274,7 +279,7 @@ def main():
     parser.add_argument("-s", "--system-context", action="store_true", help="Use system context from ./prompt/__system_context__.md as user text")
     parser.add_argument("-p", "--prompt-context", action="store_true", help="Use prompt context from ./prompt/__prompt__.md")
     parser.add_argument("-r", "--response", action="store_true", help="Use previous response as context")
-    parser.add_argument("-m", '--message', help='Message to be sent')
+    parser.add_argument("-m", '--message', nargs='*', help='Message to be sent')
     parser.add_argument("-v", '--verbose', action="store_true", help='Print input to console')
     parser.add_argument("-M", '--model', help='Model to be used', default=config["MODEL_NAME"])
     parser.add_argument("-b", '--bug', action="store_true", help='Path to bug report file (default: ./prompt/__bug__.md)')
