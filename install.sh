@@ -39,15 +39,11 @@ cat << 'EOF'
 ║                        USAGE TIP                           ║
 ║                                                            ║
 
-Run: 
+    Run: 
 
 python /usr/local/bin/llama4_terminal_client/llama4_terminal_client.py -h
 
-║                                                            ║
-                                                             ║
-For convenience, add an alias to your ~/.bashrc:             ║
-
-║                                                            ║
+    For convenience, add an alias to your ~/.bashrc:             
 
 alias llama4='python /usr/local/bin/llama4_terminal_client/llama4_terminal_client.py'
 
